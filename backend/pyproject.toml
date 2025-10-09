@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "todo"
+version = "0.1.0"
+description = ""
+authors = ["Pavlov Danil <danpavkzn@mail.ru>"]
+readme = "README.md"
+package-mode = false 
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+fastapi = {extras = ["standard"], version = "^0.117.1"}
+uvicorn = {extras = ["standart"], version = "^0.37.0"}
+pydantic = {extras = ["email"], version = "^2.11.9"}
+black = "^25.9.0"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.43"}
+aiosqlite = "^0.21.0"
+pydantic-settings = "^2.11.0"
+alembic = "^1.16.5"
+asyncpg = "^0.30.0"
+bcrypt = "^5.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
