@@ -1,0 +1,64 @@
+.main-page {
+  padding: 50px 200px;
+  height: 100%;
+}
+.main-page__header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.main-page__title {
+  font-weight: 300;
+  font-size: 20px;
+}
+.main-page__button {
+  background-color: black;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.main-page__search {
+  background-color: #e5e5e5;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+.main-page__search img {
+  width: 20px;
+  height: 20px;
+  padding-right: 10px;
+}
+.main-page__input {
+  width: 100%;
+  background-color: #e5e5e5;
+  border: none;
+}
+
+.main-page__tasks-title {
+  display: block;
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 20px;
+}
+
+.main-page__active-tasks {
+  display: flex;
+  flex-direction: column;
+}
+.main-page__completed-tasks {
+  padding-bottom: 20px;
+}
+.main-page__welcom {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  font-weight: bold;
+}

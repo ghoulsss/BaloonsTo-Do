@@ -1,0 +1,33 @@
+.folder-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.folder-item__content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.folder-item__content img {
+  width: 18px;
+  height: 18px;
+}
+
+.folder-item__counter {
+  padding: 8px;
+  background-color: #e5e5e5;
+  border-radius: 8px;
+}
+
+.folder-item:hover {
+  background-color: #e5e5e5;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.active {
+  background-color: #e5e5e5;
+  border-radius: 10px;
+}

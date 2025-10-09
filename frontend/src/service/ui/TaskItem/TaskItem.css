@@ -1,0 +1,50 @@
+.task-item {
+  padding-bottom: 20px;
+  display: flex;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  justify-content: space-between;
+}
+.task-item_content {
+  display: flex;
+  flex-direction: column;
+}
+.task-item_checkbox {
+  margin-right: 20px;
+}
+.task-item_content {
+  gap: 10px;
+}
+.content__description {
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.5);
+}
+.content_tag-date {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.content__date {
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.content__tag {
+  border: 1px solid #e5e5e5;
+  padding: 6px;
+  font-size: 15px;
+  border-radius: 10px;
+}
+
+.main-page__delete-img {
+  width: 25px;
+  height: 25px;
+}
+.task-item__check-title {
+  display: flex;
+}
+.task-item img {
+  cursor: pointer;
+}
