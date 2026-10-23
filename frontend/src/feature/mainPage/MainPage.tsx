@@ -6,11 +6,14 @@ import AddTask from "../modals/addTask/AddTask";
 import { useOutletContext } from "react-router-dom";
 type ContextType = {
   tasks: Task[] | null;
+  selectedTitle: string;
   user: User | null;
   RefreshPage: () => void;
 };
 function MainPage() {
-  const { tasks, user, RefreshPage } = useOutletContext<ContextType>();
+  const { tasks, user, RefreshPage, selectedTitle } = useOutletContext<ContextType>();
+  const [search, setSearch] = useState("");
+  const filteredTasks = tasks?.filter(task => `${task.title} ${task.description ?? ""}`.toLocaleLowerCase().includes(search.toLocaleLowerCase().trim()));
   const [openModal, setOpenModal] = useState(false);
   const closeModal = async () => {
     setOpenModal(false);
@@ -19,7 +22,7 @@ function MainPage() {
   return user ? (
     <div className="main-page">
       <div className="main-page__header">
-        <span className="main-page__title">Все задачи</span>
+        <span className="main-page__title">{selectedTitle}</span>
         <button
           className="main-page__button"
           onClick={() => setOpenModal(true)}
@@ -28,10 +31,12 @@ function MainPage() {
         </button>
       </div>
       <div className="main-page__search">
-        <img src="../public/search.png" alt="icon" />
+        <img src="/search.png" alt="icon" />
         <input
           className="main-page__input"
           placeholder="Поиск задач..."
+          value={search}
+          onChange={event => setSearch(event.target.value)}
         ></input>
       </div>
 
@@ -39,14 +44,13 @@ function MainPage() {
         <span className="main-page__tasks-title">Активные задачи</span>
         <div className="main-page_tasks-items">
           {tasks &&
-            tasks
+            filteredTasks
               ?.filter((el) => !el.completed)
               .map((el) => (
                 <TaskItem
                   RefreshPage={RefreshPage}
                   data={el}
                   key={el.id}
-                  userId={user?.id ?? null}
                 />
               ))}
         </div>
@@ -55,14 +59,13 @@ function MainPage() {
         <span className="main-page__tasks-title">Выполненные задачи</span>
         <div className="main-page_tasks-items">
           {tasks &&
-            tasks
+            filteredTasks
               ?.filter((el) => el.completed)
               .map((el) => (
                 <TaskItem
                   RefreshPage={RefreshPage}
                   data={el}
                   key={el.id}
-                  userId={user?.id ?? null}
                 />
               ))}
         </div>

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api_v1.tasks.schemas import Task, TaskCreate, TaskUpdate, TaskRead
@@ -22,7 +22,7 @@ async def get_tasks(
     folder_id: int | None = None,
     user_id: int | None = None,
     completed: bool | None = None,
-    limit: int = None,
+    limit: int | None = Query(default=None, ge=1, le=1000),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     return await crud.read_task(
@@ -39,7 +39,7 @@ async def get_task_by_id(task: Task = Depends(task_by_id)):
     return task
 
 
-@router.patch("/{task_id}")
+@router.patch("/{task_id}", response_model=TaskRead)
 async def update_task(
     task_changes: TaskUpdate,
     task: Task = Depends(task_by_id),

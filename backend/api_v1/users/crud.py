@@ -18,7 +18,7 @@ async def create_user(session: AsyncSession, user: UserCreate) -> User:
             (User.email == user.email) | (User.username == user.username)
         )
     )
-    existing_user = result.scalar_one_or_none()
+    existing_user = result.scalars().first()
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -36,7 +36,7 @@ async def create_user(session: AsyncSession, user: UserCreate) -> User:
     except IntegrityError:
         await session.rollback()
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             detail=f"User with this email or username already exists (race condition)",
         )
     return db_user
@@ -84,8 +84,14 @@ async def update_user(
     session: AsyncSession, user: User, user_changes: UserUpdate
 ) -> User:
     for name, value in user_changes.model_dump(exclude_unset=True).items():
+        if name == "password_hash":
+            value = hash_password(value)
         setattr(user, name, value)
-    await session.commit()
+    try:
+        await session.commit()
+    except IntegrityError:
+        await session.rollback()
+        raise HTTPException(409, "Username or email already exists")
     return user
 
 
@@ -102,7 +108,7 @@ async def get_user_by_username(session: AsyncSession, username: str) -> User | N
 
 async def login_user(session: AsyncSession, username: str, password: str) -> dict:
     user = await get_user_by_username(session, username)
-    if not user or not verify_password(password, user.password_hash):
+    if not user or not user.active or not verify_password(password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",

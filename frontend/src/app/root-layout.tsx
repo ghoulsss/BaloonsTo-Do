@@ -9,90 +9,56 @@ import AddFolder from "../feature/modals/addFolder/AddFolder";
 import { getFolders } from "../service/actions/Folder/Folder";
 
 function Layout() {
-  const [tasks, setTasks] = useState<Task[] | null>(null);
-  const [folders, setFolders] = useState<Folder[] | null>(null);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const [selectedFolder, setSelectedFolder] = useState<number | null>(null);
-  const [allTask, setAllTask] = useState<Task[] | null>(null);
+  const [allTask, setAllTask] = useState<Task[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [activeModal, setActiveModal] = useState(0);
-  const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState("");
+  const [revision, setRevision] = useState(0);
+  const [user, setUser] = useState<User | null>(readStoredUser);
 
-  const closeModal = async () => {
-    setOpenModal(false);
-  };
+  function readStoredUser(): User | null {
+    try {
+      const value = JSON.parse(localStorage.getItem("user") || "null");
+      return value && Number.isInteger(value.id) && typeof value.username === "string"
+        ? value : null;
+    } catch {
+      return null;
+    }
+  }
+
+  const closeModal = () => setOpenModal(false);
 
   function RefreshUser() {
-    const userString = localStorage.getItem("user");
-    if (userString) {
-      const user = JSON.parse(userString);
-      setUser(user);
-    } else {
-      setUser(null);
-      setFolders(null);
-      setTasks(null);
-      setAllTask(null);
-      setSelectedFolder(null);
-    }
+    setUser(readStoredUser());
+    setFolders([]);
+    setAllTask([]);
+    setSelectedFolder(null);
+    setError("");
   }
 
   useEffect(() => {
-    RefreshUser();
-  }, []);
-
-  useEffect(() => {
-    async function loadFolders() {
-      const data = await getFolders({ user_id: user?.id });
-
-      setFolders(data);
-    }
-    if (user) {
-      loadFolders();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    async function loadTasks() {
-      const data = await getTasks({ user_id: user?.id });
-      setTasks(data);
-      setAllTask(data);
-    }
-    if (user) {
-      loadTasks();
-    }
-  }, [user]);
-
-  async function loadTasks() {
-    const params = selectedFolder
-      ? { folder_id: selectedFolder, user_id: user?.id }
-      : { user_id: user?.id };
-    const data = await getTasks(params);
-    setTasks(data);
-  }
-
-  useEffect(() => {
-    if (selectedFolder) {
-      loadTasks();
-    } else {
-      setTasks(allTask);
-    }
-  }, [selectedFolder]);
-
-  async function loadFolders() {
-    const data = await getFolders({ user_id: user?.id });
-
-    setFolders(data);
-  }
-
-  function RefreshPage() {
-    async function loadAllTasks() {
-      const data = await getTasks({
-        user_id: user?.id,
+    if (!user) return;
+    let cancelled = false;
+    Promise.all([getTasks({ user_id: user.id }), getFolders({ user_id: user.id })])
+      .then(([tasks, folders]) => {
+        if (cancelled) return;
+        setAllTask(tasks);
+        setFolders(folders);
+        setError("");
+      })
+      .catch(() => {
+        if (!cancelled) setError("Не удалось загрузить данные. Попробуйте ещё раз.");
       });
-      setAllTask(data);
-    }
-    loadAllTasks();
-    loadTasks();
-    loadFolders();
+    return () => { cancelled = true; };
+  }, [user, revision]);
+
+  const tasks = selectedFolder === null
+    ? allTask : allTask.filter(task => task.folder_id === selectedFolder);
+  const selectedTitle = folders.find(folder => folder.id === selectedFolder)?.title || "Все задачи";
+  function RefreshPage() {
+    setRevision(value => value + 1);
   }
 
   return (
@@ -101,19 +67,17 @@ function Layout() {
         <div className="layout__header-icon-title">
           <img
             className="layout__header-icon"
-            src="../public/to-do-list.png"
+            src="/to-do-list.png"
             alt="фото"
           />
           <span className="layout__header-title">ToDo Baloons</span>
         </div>
         {user ? (
-          <div>
-            <span
-              style={{ marginRight: "30px" }}
-            >{`Здравствуйте, ${user.username}`}</span>
+          <div className="layout__account">
+            <span>{`Здравствуйте, ${user.username}`}</span>
             <button
               onClick={() => {
-                localStorage.clear();
+                localStorage.removeItem("user");
                 RefreshUser();
               }}
               className="layout__header-button"
@@ -167,7 +131,8 @@ function Layout() {
           </div>
         </aside>
         <main className="layout__content">
-          <Outlet context={{ tasks, user, RefreshPage }} />
+          {error && <div role="alert">{error} <button onClick={RefreshPage}>Повторить</button></div>}
+          <Outlet context={{ tasks, user, RefreshPage, selectedTitle }} />
         </main>
       </div>
       {openModal && activeModal === 1 && (

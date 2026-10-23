@@ -10,4 +10,4 @@ class Folder(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped["User"] = relationship("User", back_populates="folders")
 
-    tasks: Mapped[list["Task"]] = relationship("Task", back_populates="folder")
+    tasks: Mapped[list["Task"]] = relationship("Task", back_populates="folder", cascade="all, delete-orphan")

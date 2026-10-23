@@ -10,10 +10,13 @@ function AuthModal({ onClose, RefreshUser }: AuthModalProps) {
   const [selectedAuth, setSelectedAuth] = useState(1);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
   const [email, setEmail] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (busy) return;
+    setBusy(true);
     try {
       if (selectedAuth === 2) {
         const userData = {
@@ -35,7 +38,9 @@ function AuthModal({ onClose, RefreshUser }: AuthModalProps) {
         onClose();
       }
     } catch {
-      alert("Ошибка");
+      alert("Ошибка: проверьте введённые данные и подключение к серверу");
+    } finally {
+      setBusy(false);
     }
   }
   useEffect(() => {
@@ -65,6 +70,9 @@ function AuthModal({ onClose, RefreshUser }: AuthModalProps) {
           <div className="modal-auth__title-input">
             <div className="title-input__title">Логин</div>
             <input
+              required
+              minLength={3}
+              maxLength={15}
               value={username}
               type="text"
               className="title-input__input"
@@ -75,6 +83,7 @@ function AuthModal({ onClose, RefreshUser }: AuthModalProps) {
           <div className="modal-auth__title-input">
             <div className="title-input__title">Пароль</div>
             <input
+              required
               value={password}
               type="password"
               className="title-input__input"
@@ -86,6 +95,7 @@ function AuthModal({ onClose, RefreshUser }: AuthModalProps) {
             <div className="modal-auth__title-input">
               <div className="title-input__title">Email</div>
               <input
+                required
                 value={email}
                 type="email"
                 className="title-input__input"
@@ -96,7 +106,7 @@ function AuthModal({ onClose, RefreshUser }: AuthModalProps) {
           )}
           <div className="modal-auth__title-input">
             <div className="modal-auth__buttons">
-              <button className="modal-auth__button" type="submit">
+              <button disabled={busy} className="modal-auth__button" type="submit">
                 {selectedAuth == 2 ? "Зарегистрироваться" : "Войти"}
               </button>
             </div>

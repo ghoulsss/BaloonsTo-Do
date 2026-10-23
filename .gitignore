@@ -5,6 +5,8 @@ app.egg-info
 .coverage
 htmlcov
 .cache
+.checks/
 .venv
 .idea/
 .vscode/
+CHECKS.md

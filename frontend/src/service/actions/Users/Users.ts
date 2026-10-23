@@ -1,6 +1,6 @@
 import type { CreateUser, UserLogin } from "../../types/Types";
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl = (import.meta.env.VITE_API_URL || "/api/v1").replace(/\/$/, "");
 
 export async function CreateUser(userData: CreateUser) {
   const response = await fetch(`${apiUrl}/users/register`, {

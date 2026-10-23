@@ -3,6 +3,8 @@ import Layout from "./root-layout";
 import "normalize.css";
 import "../css/reset.css";
 import MainPage from "../feature/mainPage/MainPage";
+import "../css/responsive.css";
+import "../css/theme.css";
 
 const router = createBrowserRouter([
   {

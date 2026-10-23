@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Query
 
 from core.models import db_helper
 from utils.auth import hash_password, verify_password
@@ -29,7 +29,7 @@ async def register(
 @router.get("/", response_model=list[User])
 async def get_users(
     active: bool | None = None,
-    limit: int | None = None,
+    limit: int | None = Query(default=None, ge=1, le=1000),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> list[User]:
     return await crud.read_user(
@@ -44,7 +44,7 @@ async def get_user_by_id(user: User = Depends(user_by_id)):
     return user
 
 
-@router.patch("/{user_id}")
+@router.patch("/{user_id}", response_model=UserRead)
 async def update_user(
     user_changes: UserUpdate,
     user: User = Depends(user_by_id),

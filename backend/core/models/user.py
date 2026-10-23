@@ -13,7 +13,7 @@ class User(Base):
     active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    tasks: Mapped[list["Task"]] = relationship("Task", back_populates="user")
+    tasks: Mapped[list["Task"]] = relationship("Task", back_populates="user", cascade="all, delete-orphan")
     folders: Mapped[list["Folder"]] = relationship(
         "Folder", back_populates="user", cascade="all, delete-orphan"
     )

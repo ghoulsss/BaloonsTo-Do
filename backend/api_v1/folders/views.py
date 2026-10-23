@@ -1,10 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api_v1.folders.schemas import Folder, FolderCreate, FolderUpdate, FolderRead
+from api_v1.tasks.schemas import TaskRead
 from core.models import db_helper
 from . import crud
 from .dependencies import folder_by_id
+
+
+class FolderWithTasks(FolderRead):
+    tasks: list[TaskRead]
+
 
 router = APIRouter(tags=["Folders"])
 
@@ -20,7 +26,7 @@ async def create_folder(
 @router.get("/", response_model=list[Folder])
 async def get_folders(
     user_id: int | None = None,
-    limit=10,
+    limit: int | None = Query(default=None, ge=1, le=1000),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     return await crud.read_folders_with_count_tasks(
@@ -53,7 +59,7 @@ async def change_folder(
 
 @router.delete("/{folder_id}")
 async def delete_folder(
-    folder: Folder = Depends(get_folder_by_id),
+    folder: Folder = Depends(folder_by_id),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     return await crud.delete_folder(
@@ -62,7 +68,7 @@ async def delete_folder(
     )
 
 
-@router.get("/{folder_id}/tasks")
+@router.get("/{folder_id}/tasks", response_model=FolderWithTasks)
 async def get_folder_tasks_extended(
     folder_id: int, session: AsyncSession = Depends(db_helper.session_dependency)
 ):

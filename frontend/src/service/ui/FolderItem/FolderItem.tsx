@@ -11,15 +11,15 @@ type FolderItemProps = {
 
 function FolderItem({ data, all, count, onClick, active }: FolderItemProps) {
   return (
-    <div className={`folder-item ${active && "active"}`} onClick={onClick}>
+    <button type="button" className={`folder-item ${active ? "active" : ""}`} onClick={onClick} aria-pressed={!!active}>
       <div className="folder-item__content">
-        <img src="../public/folder-48.png" alt="icon" />
+        <img src="/folder-48.png" alt="icon" />
         <span>{all ? "Все задачи" : data?.title}</span>
       </div>
       <span className="folder-item__counter">
-        {count ? count : data?.count_tasks}
+        {count ?? data?.count_tasks ?? 0}
       </span>
-    </div>
+    </button>
   );
 }
 export default FolderItem;

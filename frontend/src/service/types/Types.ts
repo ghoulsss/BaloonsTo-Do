@@ -5,6 +5,7 @@ export type Task = {
     title: string;
   } | null;
   id: number;
+  folder_id: number | null;
   completed: boolean;
   created_at: string;
 };
@@ -42,7 +43,7 @@ export type User = {
 export type TaskUpdate = {
   title?: string | null;
   description?: string | null;
-  folder_id?: string | null;
+  folder_id?: number | null;
   user_id?: number | null;
   completed?: boolean | null;
 };

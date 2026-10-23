@@ -5,7 +5,7 @@ WORKDIR /app
 # Копируем package.json и package-lock.json
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci --no-audit --no-fund --fetch-timeout=30000 --fetch-retries=2
 
 COPY . .
 

@@ -1,50 +1,45 @@
 from datetime import datetime
-from typing import Annotated, List, TYPE_CHECKING
-
-from annotated_types import MinLen, MaxLen
-from pydantic import BaseModel, EmailStr, ConfigDict
-
-# if TYPE_CHECKING:
-# from api_v1.folders.schemas import FolderRead
-# from api_v1.tasks.schemas import TaskRead
+from typing import Annotated
+from pydantic import BaseModel, EmailStr, ConfigDict, Field, AfterValidator
 
 
-# from api_v1.tasks.schemas import Task
+def validate_password(value: str) -> str:
+    if not value or len(value.encode("utf-8")) > 72:
+        raise ValueError("Password must contain 1 to 72 UTF-8 bytes")
+    return value
+
+
+Password = Annotated[str, AfterValidator(validate_password)]
+Username = Annotated[str, Field(min_length=3, max_length=15, pattern=r"^\S+$")]
 
 
 class UserBase(BaseModel):
-    username: Annotated[str, MinLen(3), MaxLen(15)]
+    model_config = ConfigDict(from_attributes=True)
+    username: Username
     email: EmailStr
 
 
-class UserCreate(UserBase):  # Для создания данных
-    password_hash: str
+class UserCreate(UserBase):
+    password_hash: Password
 
 
-class UserRead(UserBase):  # Для возвращения данных
+class UserRead(UserBase):
     id: int
-    active: bool | None = True
+    active: bool
     created_at: datetime
 
 
-class UserUpdate(UserBase):  # Для создания данных
-    username: str | None = None
-    email: EmailStr | None = None
-    password_hash: str | None = None
-    active: bool | None = None
+class UserUpdate(BaseModel):
+    username: Username = None
+    email: EmailStr = None
+    password_hash: Password = None
+    active: bool = None
 
 
-class User(UserBase):  # Для возвращения данных
-    model_config = ConfigDict(
-        from_attributes=True
-    )  # в ручках мы возращаем объекты SQLAlchemy, а не словари на вывод фронтенду.
-    # Это конфигурация в которой мы указываем что нужно брать свойства с атрибутов объекта
-    # FastAPI с ConfigDict(from_attributes=True) умеет автоматически брать данные из ORM-модели и превращать их в Pydantic-схему.
-    id: int
-    active: bool | None = True
-    created_at: datetime
+class User(UserRead):
+    pass
 
 
 class UserLogin(BaseModel):
     username: str
-    password: str
+    password: Password
